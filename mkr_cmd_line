@@ -1,0 +1,48 @@
+import paramiko
+import time
+
+# Функция для выполнения команды на устройстве по SSH
+def execute_command_ssh(ip, username, password, port, command):
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        # Установка таймаута для подключения
+        client.connect(ip, port=port, username=username, password=password, timeout=1)
+
+        # Вывод отладочной информации
+        print(f"Подключение к {ip} установлено")
+        
+        stdin, stdout, stderr = client.exec_command(command)
+        
+        print(f"Выполнение команды: {command}")
+        print(f"Вывод от {ip}: {stdout.read().decode()}")
+        
+        # Вывод отладочной информации об ошибках
+        if stderr.read().decode():
+            print(f"Ошибки от {ip}: {stderr.read().decode()}")
+        
+        client.close()
+        print(f"Подключение к {ip} закрыто")
+    except Exception as e:
+        print(f"Ошибка выполнения команды на {ip}: {str(e)}")
+
+# Чтение списка IP из файла
+with open('ipmk.txt', 'r') as file:
+    ip_list = file.readlines()
+
+# Чтение списка команд из файла
+with open('com.txt', 'r') as file:
+    commands_list = file.readlines()
+
+# Параметры для подключения
+username = "your_login"
+password = "your_password"
+port = your_ssh_port
+
+# Перебор IP адресов и выполнение команд
+for ip in ip_list:
+    ip = ip.strip()
+    for command in commands_list:
+        command = command.strip()
+        execute_command_ssh(ip, username, password, port, command)
